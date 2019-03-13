@@ -1,7 +1,8 @@
 (ns learning-clojure.core
+  (:import (java.io File))
+  (:require [clojure.set :as s])
   (:gen-class))
-(import 'java.io.File)
-(require '[clojure.set :as s])
+
 (def visitors (atom #{}))
 
 (defn hello-with-memory [name]
@@ -51,7 +52,7 @@
   "Renames key in key-map eg:
   (rename compositions {:name :title})"
   [in-map key-map]
-  (set (for [m compositions] (apply merge (for [[key val] m] {(get key-map key key) val})))))
+  (set (for [m in-map] (apply merge (for [[key val] m] {(get key-map key key) val})))))
 
 (defn select
   "Selects entries from relation approved by predicate eg:
@@ -68,10 +69,11 @@
 (defn join
   "Joins two relations on shared key eg:
   (join compositions composers)"
-  [relation-1 relation-2]
+  [relation-1 relation-2 & [[src dst] :as mapping]]
   (set (for [m1 relation-1 m2 relation-2
              :let [common-key (first (s/intersection (set (keys m1)) (set (keys m2))))]
-             :when (= (m1 common-key) (m2 common-key))]
+             :when (cond mapping (= (m1 src) (m2 dst))
+                         true (= (m1 common-key) (m2 common-key)))]
          (merge-with #(identity %2) m1 m2))))
 
 (defn -main
