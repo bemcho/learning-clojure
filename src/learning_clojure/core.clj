@@ -53,18 +53,32 @@
   (rename compositions {:name :title})"
   [in-map key-map]
   (set (for [m in-map] (apply merge (for [[key val] m] {(get key-map key key) val})))))
+;(rename compositions {:name :title})
+;-> #{{:title "Requiem", :composer "Giuseppe Verdi"}
+;     {:title "Musical Offering", :composer "J.S. Bach"}
+;     {:title "Requiem", :composer "W. A. Mozart"}
+;     {:title "The Art of the Fugue", :composer "J.S. Bach"}}
 
 (defn select
   "Selects entries from relation approved by predicate eg:
   (select #(= (:name %) \"Requiem\") compositions)"
   [pred relation]
   (set (for [m relation :when (pred m)] m)))
+;(select #(= (:name %) "Requiem") compositions)
+;-> #{{:name "Requiem", :composer "W. A. Mozart"}
+;     {:name "Requiem", :composer "Giuseppe Verdi"}}
 
 (defn project
   "Selects that specifies a subset of columns in keys eg:
   (project compositions [:name])"
   [relation keys]
   (set (for [m relation] (apply merge (for [[key val] m :when ((set keys) key)] {key val})))))
+;(project
+;  (join
+;    (select #(= (:name %) "Requiem") compositions)
+;    composers)
+;  [:country])
+;=> #{{:country "Italy"} {:country "Austria"}}
 
 (defn join
   "Joins two relations on shared key eg:
@@ -75,6 +89,21 @@
              :when (cond mapping (= (m1 src) (m2 dst))
                          true (= (m1 common-key) (m2 common-key)))]
          (merge-with #(identity %2) m1 m2))))
+;(join composers
+;      -> #{{:language
+;            :composer
+;            {:language
+;             :composer
+;             {:language
+;                      :composer
+;              nations {:country :nation})
+;           "German", :nation "Austria",
+;           "W. A. Mozart", :country "Austria"}
+;      "German", :nation "Germany",
+;      "J. S. Bach", :country "Germany"}
+;"Italian", :nation "Italy",
+;"Giuseppe Verdi", :country "Italy"}}
+
 
 (defn -main
   "I don't do a whole lot ... yet."
