@@ -54,7 +54,8 @@
   [in-map key-map]
   (set (for [m in-map] (apply merge (for [[key val] m] {(get key-map key key) val})))))
 ;(rename compositions {:name :title})
-;-> #{{:title "Requiem", :composer "Giuseppe Verdi"}
+;=>
+; #{{:title "Requiem", :composer "Giuseppe Verdi"}
 ;     {:title "Musical Offering", :composer "J.S. Bach"}
 ;     {:title "Requiem", :composer "W. A. Mozart"}
 ;     {:title "The Art of the Fugue", :composer "J.S. Bach"}}
@@ -65,7 +66,8 @@
   [pred relation]
   (set (for [m relation :when (pred m)] m)))
 ;(select #(= (:name %) "Requiem") compositions)
-;-> #{{:name "Requiem", :composer "W. A. Mozart"}
+;=>
+; #{{:name "Requiem", :composer "W. A. Mozart"}
 ;     {:name "Requiem", :composer "Giuseppe Verdi"}}
 
 (defn project
@@ -75,10 +77,10 @@
   (set (for [m relation] (apply merge (for [[key val] m :when ((set keys) key)] {key val})))))
 ;(project
 ;  (join
-;    (select #(= (:name %) "Requiem") compositions)
-;    composers)
+;    (select #(= (:name %) "Requiem") compositions) composers)
 ;  [:country])
-;=> #{{:country "Italy"} {:country "Austria"}}
+;=>
+; #{{:country "Italy"} {:country "Austria"}}
 
 (defn join
   "Joins two relations on shared key eg:
@@ -89,20 +91,11 @@
              :when (cond mapping (= (m1 src) (m2 dst))
                          true (= (m1 common-key) (m2 common-key)))]
          (merge-with #(identity %2) m1 m2))))
-;(join composers
-;      -> #{{:language
-;            :composer
-;            {:language
-;             :composer
-;             {:language
-;                      :composer
-;              nations {:country :nation})
-;           "German", :nation "Austria",
-;           "W. A. Mozart", :country "Austria"}
-;      "German", :nation "Germany",
-;      "J. S. Bach", :country "Germany"}
-;"Italian", :nation "Italy",
-;"Giuseppe Verdi", :country "Italy"}}
+;(join composers nations [:country :nation])
+;=>
+;#{{:composer "W. A. Mozart", :country "Austria", :nation "Austria", :language "German"}
+;  {:composer "J. S. Bach", :country "Germany", :nation "Germany", :language "German"}
+;  {:composer "Giuseppe Verdi", :country "Italy", :nation "Italy", :language "Italian"}}
 
 
 (defn -main
