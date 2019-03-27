@@ -18,13 +18,13 @@
              (subset? goals current-state :test '=))
       current-state)))
 
-;(defn achieve (state goal goal-stack)
-;  " A goal is achieved if it a1 ready holds.
-;  or if there is an appropriate op for it that is applicable."
-;  (cond ((member-equal goal state) state)
-;        ((member-equal goal goal -stack) ni 1
-;          (t (some? (fn [op] (apply-op state goal op goal-stack)
-;                   (find-all goal *ops* :test #'appropriate-p) 1) 1))))
+(defn achieve [state goal goal-stack]
+  " A goal is achieved if it a1 ready holds.
+  or if there is an appropriate op for it that is applicable."
+  (cond ((contains? goal state) state)
+        ((contains? goal goal-stack) nil
+          (true (some (fn [op] (apply-op state goal op goal-stack)
+                        (find-all goal *ops* :test appropriate-p) 1) 1)))))
 
 
 (defn subset? [goals current-state & {:keys [test]}])
@@ -36,6 +36,9 @@
   "General Problem Solver: from s t a t e , achieve goals using *ops*. "
   (remove symbol? (achieve-all (conj '(start) state) goals nil)))
 
+
+
+;;;; Test data
 (def *school-ops*
   (atom
     (list
