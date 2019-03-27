@@ -32,9 +32,9 @@
 (def *ops* " A list of available operators." (atom ()))
 
 
-(defn GPS (state goals & {:keys [ops]})
+(defn GPS [state goals {:keys [ops]}]
   "General Problem Solver: from s t a t e , achieve goals using *ops*. "
-  (remove #'atom? (achieve-all (cons '(start) state) goals nil)))
+  (remove symbol? (achieve-all (conj '(start) state) goals nil)))
 
 (def *school-ops*
   (atom
